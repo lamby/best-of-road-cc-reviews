@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+
+import urllib
+
+from lxml.html import parse, tostring
+
+def main():
+    root = GET('/review-archive')
+
+    data = {}
+
+    for elem in root.xpath('//a[starts-with(@href,("/show/review-section/"))]'):
+        data[elem.text_content()] = section(elem.get('href'))
+
+    print data
+
+def section(url):
+    return []
+
+def GET(suffix):
+    url = 'http://road.cc%s' % suffix
+
+    print "I: Downloading %s" % url
+
+    return parse(urllib.urlopen(url))
+
+main()
