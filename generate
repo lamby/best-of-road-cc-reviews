@@ -35,6 +35,9 @@ def section(url):
         stars = find(x, '.review-stars img').get('src')
         rating = int(stars.split('-', 1)[1].split('.')[0])
 
+        if rating < 9:
+            continue
+
         title = find(x, '.review-title a')
 
         result.append({
