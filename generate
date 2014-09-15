@@ -1,27 +1,63 @@
 #!/usr/bin/env python
 
+import sys
 import urllib
 
 from lxml.html import parse, tostring
+from lxml.cssselect import CSSSelector
+
+BASE_URL = 'http://road.cc'
 
 def main():
     root = GET('/review-archive')
 
-    data = {}
+    data = []
 
-    for elem in root.xpath('//a[starts-with(@href,("/show/review-section/"))]'):
-        data[elem.text_content()] = section(elem.get('href'))
+    for x in findall(root, '#block-roadcc_blocks-review_taxonomy'):
+        row = []
 
-    print data
+        for child in findall(x, 'li a'):
+            row.append((child.text, section(child.get('href'))))
+
+        data.append((find(x, '.fieldset-title').text, row))
+
+    from pprint import pprint
+    pprint(data)
+
+    return 0
 
 def section(url):
-    return []
+    root = GET(url)
+
+    result = []
+
+    for x in findall(root, '.review-archive'):
+        stars = find(x, '.review-stars img').get('src')
+        rating = int(stars.split('-', 1)[1].split('.')[0])
+
+        title = find(x, '.review-title a')
+
+        result.append({
+            'url': '%s%s' % (BASE_URL, title.get('href')),
+            'title': title.text,
+            'price': find(x, '.review-price').text,
+            'rating': rating,
+        })
+
+    return result
 
 def GET(suffix):
-    url = 'http://road.cc%s' % suffix
+    url = '%s%s' % (BASE_URL, suffix)
 
     print "I: Downloading %s" % url
 
     return parse(urllib.urlopen(url))
 
-main()
+def findall(elem, selector):
+    return CSSSelector(selector)(elem)
+
+def find(elem, selector):
+    return findall(elem, selector)[0]
+
+if __name__ == '__main__':
+    sys.exit(main())
