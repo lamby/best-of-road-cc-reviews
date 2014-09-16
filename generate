@@ -68,7 +68,8 @@ def get_reviews():
             if section:
                 row.append((y.text, section))
 
-        result.append((find(x, '.fieldset-title').text, row))
+        if row:
+            result.append((find(x, '.fieldset-title').text, row))
 
     return result
 
