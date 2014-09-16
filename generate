@@ -59,7 +59,7 @@ def get_reviews():
 
     result = []
 
-    for x in findall(root, '#block-roadcc_blocks-review_taxonomy'):
+    for x in findall(root, '#block-roadcc_blocks-review_taxonomy .fieldset'):
         row = []
 
         for y in findall(x, 'li a'):
