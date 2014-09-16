@@ -43,7 +43,7 @@ def section(url):
         result.append({
             'url': '%s%s' % (BASE_URL, title.get('href')),
             'title': title.text,
-            'price': find(x, '.review-price').text,
+            'price': float(find(x, '.review-price').text[1:]),
             'rating': rating,
         })
 
