@@ -26,7 +26,7 @@ def main():
 
     return 0
 
-def section(url):
+def get_section(url):
     root = GET(url)
 
     result = []
