@@ -50,7 +50,7 @@ TEMPLATE = """
 """
 
 def main():
-    print generate_html(get_reviews())
+    print generate_html(get_reviews()).encode('utf-8')
 
     return 0
 
