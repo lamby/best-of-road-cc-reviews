@@ -28,9 +28,17 @@ TEMPLATE = """
         <p><a class="btn btn-lg btn-primary" href="http://road.cc/review-archive" role="button">View all road.cc reviews</a></p>
       </div>
 
+      <h1 class="page-header" id="contents">Contents</h1>
+      <ul>
+        {% for parent_title, _ in reviews %}
+        <li><a href="#section{{ loop.index }}">{{ parent_title }}</a></li>
+        {% endfor %}
+      </ul>
+
       {% for parent_title, parent in reviews %}
-      <h1 class="page-header">
+      <h1 class="page-header" id="section{{ loop.index }}">
         {{ parent_title }}
+        <small><a href="#contents">(back to contents)</a></small>
       </h1>
 
       {% for child_title, child in parent %}
@@ -43,7 +51,9 @@ TEMPLATE = """
           </li>
         {% endfor %}
       {% endfor %}
-     {% endfor %}
+      <br>
+
+    {% endfor %}
     </div>
   </body>
 </html>
