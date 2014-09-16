@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import jinja2
 import urllib
 
 from lxml.html import parse, tostring
@@ -8,23 +9,68 @@ from lxml.cssselect import CSSSelector
 
 BASE_URL = 'http://road.cc'
 
+TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Best of road.cc reviews</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+    <br>
+      <div class="jumbotron">
+        <h1>Best of road.cc reviews</h1>
+        <p class="lead">Skip to the best items.</p>
+        <p><a class="btn btn-lg btn-primary" href="http://road.cc/review-archive" role="button">View all road.cc reviews</a></p>
+      </div>
+
+      {% for parent_title, parent in reviews %}
+      <h1 class="page-header">
+        {{ parent_title }}
+      </h1>
+
+      {% for child_title, child in parent %}
+        <h3>{{ child_title }}</h3>
+
+        {% for review in child|sort(attribute='price')  %}
+        <li>
+          <a href="{{ review.url }}">{{ review.title }}</a>
+          &pound;{{ "%.2f"|format(review.price) }}
+          </li>
+        {% endfor %}
+      {% endfor %}
+     {% endfor %}
+    </div>
+  </body>
+</html>
+"""
+
 def main():
+    print generate_html(get_reviews())
+
+    return 0
+
+def get_reviews():
     root = GET('/review-archive')
 
-    data = []
+    result = []
 
     for x in findall(root, '#block-roadcc_blocks-review_taxonomy'):
         row = []
 
-        for child in findall(x, 'li a'):
-            row.append((child.text, section(child.get('href'))))
+        for y in findall(x, 'li a'):
+            section = get_section(y.get('href'))
 
-        data.append((find(x, '.fieldset-title').text, row))
+            if section:
+                row.append((y.text, section))
 
-    from pprint import pprint
-    pprint(data)
+        result.append((find(x, '.fieldset-title').text, row))
 
-    return 0
+    return result
 
 def get_section(url):
     root = GET(url)
@@ -61,6 +107,9 @@ def findall(elem, selector):
 
 def find(elem, selector):
     return findall(elem, selector)[0]
+
+def generate_html(reviews):
+    return jinja2.Template(TEMPLATE.strip()).render(reviews=reviews)
 
 if __name__ == '__main__':
     sys.exit(main())
