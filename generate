@@ -52,7 +52,7 @@ def section(url):
 def GET(suffix):
     url = '%s%s' % (BASE_URL, suffix)
 
-    print "I: Downloading %s" % url
+    print >>sys.stderr, "I: Downloading %s" % url
 
     return parse(urllib.urlopen(url))
 
